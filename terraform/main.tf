@@ -107,11 +107,9 @@ resource "aws_instance" "app" {
     yum install -y docker
     systemctl enable docker
     systemctl start docker
-
-    # Pull and run Docker container from Docker Hub
-    docker pull ${var.docker_image_url}:${var.image_tag}
-    docker rm -f portfolio || true
-    docker run -d --name portfolio -p 80:80 ${var.docker_image_url}:${var.image_tag}
+    
+    # Create simple test container
+    docker run -d --name portfolio -p 80:80 nginx:latest
   EOF
   )
 
