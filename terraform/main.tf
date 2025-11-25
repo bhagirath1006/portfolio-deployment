@@ -82,36 +82,6 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# IAM Role for EC2
-resource "aws_iam_role" "ec2_role" {
-  name = "portfolio-ec2-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-# IAM Role Policy
-resource "aws_iam_role_policy_attachment" "ec2_ssm" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-# IAM Instance Profile
-resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "portfolio-ec2-profile"
-  role = aws_iam_role.ec2_role.name
-}
-
 # Get Latest Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux_2" {
   most_recent = true
@@ -129,7 +99,6 @@ resource "aws_instance" "app" {
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
   associate_public_ip_address = true
 
   user_data = base64encode(<<-EOF
